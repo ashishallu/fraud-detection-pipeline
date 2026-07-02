@@ -13,7 +13,7 @@ A production-style, end-to-end real-time fraud detection system. Streams live tr
 
 ---
 
-## 📐 Architecture
+##  Architecture
 
 ```
 Live Transactions (IEEE-CIS CSV replay)
@@ -42,7 +42,7 @@ Live Transactions (IEEE-CIS CSV replay)
 
 ---
 
-## 📊 Model Performance
+##  Model Performance
 
 | Metric | Score |
 |---|---|
@@ -55,7 +55,7 @@ Trained on ~590K transactions from the [IEEE-CIS Fraud Detection](https://www.ka
 
 ---
 
-## 🖥️ Dashboard Preview
+##  Dashboard Preview
 
 | Page | What it shows |
 |---|---|
@@ -64,11 +64,11 @@ Trained on ~590K transactions from the [IEEE-CIS Fraud Detection](https://www.ka
 | **Model Performance** | Training curves, confusion matrix, feature importance |
 | **Graph Explorer** | Subgraph visualization for any card ID |
 
-> 📹 See `fraud-detection-pipeline-demo.mp4` for a full walkthrough.
+>  See `fraud-detection-pipeline-demo.mp4` for a full walkthrough.
 
 ---
 
-## ⚙️ System Requirements
+##  System Requirements
 
 | | Minimum | Recommended |
 |---|---|---|
@@ -80,7 +80,7 @@ Trained on ~590K transactions from the [IEEE-CIS Fraud Detection](https://www.ka
 
 ---
 
-## 🚀 Setup
+##  Setup
 
 ### 1. Clone the repo
 
@@ -133,11 +133,11 @@ pip install torch-scatter torch-sparse -f https://data.pyg.org/whl/torch-2.1.0+c
 
 ---
 
-## ▶️ Run Order
+##  Run Order
 
 Open a **separate terminal** for each step.
 
-#### Step 1 — Start infrastructure
+#### Step 1 - Start infrastructure
 ```bash
 docker-compose up -d
 ```
@@ -145,24 +145,24 @@ Wait ~30 seconds, then verify:
 - Spark UI → http://localhost:8080
 - Kafka → `docker ps` (all containers should be `healthy`)
 
-#### Step 2 — Build the transaction graph *(one-time)*
+#### Step 2 - Build the transaction graph *(one-time)*
 ```bash
 python graph/graph_builder.py
 ```
 Loads the IEEE-CIS CSVs, builds the heterogeneous account-merchant-email graph, and saves to `models/graph_data.pt`. Takes 2–5 minutes.
 
-#### Step 3 — Train the GNN *(one-time)*
+#### Step 3 - Train the GNN *(one-time)*
 ```bash
 python training/train_gnn.py
 ```
 Trains HeteroGraphSAGE for 50 epochs. Saves:
-- `models/gnn_model.pt` — best checkpoint
-- `models/training_curves.png` — loss + AUC plots
-- `models/test_results.json` — final test metrics
+- `models/gnn_model.pt` - best checkpoint
+- `models/training_curves.png` - loss + AUC plots
+- `models/test_results.json` - final test metrics
 
 Takes 10–30 minutes on CPU (faster with GPU).
 
-#### Step 4 — Start the Kafka producer
+#### Step 4 - Start the Kafka producer
 ```bash
 python producer/kafka_producer.py --mode fast       # for testing
 python producer/kafka_producer.py --mode realistic  # for demo
@@ -170,15 +170,15 @@ python producer/kafka_producer.py --mode burst      # for stress testing
 ```
 Expected output: `Produced 1000 / 590540 transactions`
 
-#### Step 5 — Start the streaming pipeline
+#### Step 5 - Start the streaming pipeline
 ```bash
 python pipeline/streaming_pipeline.py
 ```
-Expected output: `Batch 0 done — 47 txns | 2 flagged | 94 txns/sec`
+Expected output: `Batch 0 done - 47 txns | 2 flagged | 94 txns/sec`
 
 Results are written to `outputs/results/` as JSONL files.
 
-#### Step 6 — Launch the dashboard
+#### Step 6 - Launch the dashboard
 ```bash
 streamlit run dashboard/app.py
 ```
@@ -186,7 +186,7 @@ Open browser at: http://localhost:8501
 
 ---
 
-## 🛑 Stopping Everything
+##  Stopping Everything
 
 ```bash
 # Ctrl+C in the pipeline and producer terminals, then:
@@ -195,7 +195,7 @@ docker-compose down
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```
 fraud-detection-pipeline/
@@ -204,7 +204,7 @@ fraud-detection-pipeline/
 ├── docker-compose.yml               # Kafka + Zookeeper + Spark
 ├── Dockerfile
 │
-├── data/                            # ⚠️ Not committed — download from Kaggle
+├── data/                            # ⚠️ Not committed - download from Kaggle
 │   ├── train_transaction.csv
 │   └── train_identity.csv
 │
@@ -246,7 +246,7 @@ fraud-detection-pipeline/
 
 ---
 
-## 🔧 Troubleshooting
+##  Troubleshooting
 
 | Error | Fix |
 |---|---|
@@ -254,12 +254,12 @@ fraud-detection-pipeline/
 | `Graph not found` | Run `python graph/graph_builder.py` before the pipeline. |
 | `CUDA out of memory` | Training uses CPU by default. If using GPU, set `SPARK_MASTER = "local[*]"` in `config.py`. |
 | `train_transaction.csv not found` | Download from Kaggle (Step 3 above). |
-| `Dashboard shows no data` | The `outputs/results/` directory is empty — run Steps 4 and 5 first. |
+| `Dashboard shows no data` | The `outputs/results/` directory is empty - run Steps 4 and 5 first. |
 | High memory usage | In Docker Desktop → Settings → Resources, set memory to 6 GB minimum. |
 
 ---
 
-## 🧠 Tech Stack
+##  Tech Stack
 
 | Component | Tool | Why |
 |---|---|---|
@@ -273,10 +273,10 @@ fraud-detection-pipeline/
 
 ---
 
-## 💡 Design Decisions
+##  Design Decisions
 
 **Why Kafka over a simple queue?**  
-Kafka's durable offset tracking allows any consumer to replay the full transaction log from any point — critical for fraud auditing and pipeline recovery.
+Kafka's durable offset tracking allows any consumer to replay the full transaction log from any point - critical for fraud auditing and pipeline recovery.
 
 **Why GNN over XGBoost?**  
 Fraud often involves rings of connected accounts sharing merchants, IPs, and email domains. A heterogeneous GNN learns these latent structural patterns that hand-engineered features miss entirely.
@@ -291,4 +291,4 @@ Replace the CSV Kafka producer with a real card-network feed → swap `local[*]`
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE) for details.
