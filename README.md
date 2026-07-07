@@ -289,6 +289,4 @@ Replace the CSV Kafka producer with a real card-network feed → swap `local[*]`
 
 ---
 
-## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
